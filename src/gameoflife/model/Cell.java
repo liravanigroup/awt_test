@@ -39,4 +39,8 @@ public class Cell {
         }
         return count;
     }
+
+    public void setStain(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
 }

@@ -1,7 +1,6 @@
 package gameoflife.grafic;
 
-import gameoflife.model.Cell;
-import gameoflife.model.GameEngine;
+import gameoflife.model.Engine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,23 +19,20 @@ class MainPanel extends JPanel {
 
     private int pixelSize;
     private int borderSize;
-    private Cell[][] generation;
+    private Engine engine;
     private boolean gameIsRun;
 
-    MainPanel(int windowWidth, int windowHeight, int pixelSize, int borderSize) {
+    MainPanel(Engine engine, int pixelSize, int borderSize) {
         this.pixelSize = pixelSize;
         this.borderSize = borderSize;
-        int countX = windowWidth / (pixelSize + borderSize);
-        int countY = windowHeight / (pixelSize + borderSize);
-        GameEngine game = new GameEngine(getCellArray(countX, countY));
-        this.generation = game.getGeneration();
+        this.engine = engine;
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 int x = e.getX() / (pixelSize + borderSize);
                 int y = e.getY() / (pixelSize + borderSize);
-                generation[y][x] = new Cell(!generation[y][x].isAlive());
+                engine.setCellStain(x,y,!engine.getCellStain(x,y));
                 repaint();
             }
         });
@@ -46,18 +42,16 @@ class MainPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 gameIsRun = true;
-                GameEngine gam = new GameEngine(generation);
                 new Thread() {
                     public void run() {
                         while (gameIsRun) {
                             repaint();
                             try {
                                 Thread.sleep(500);
-                            } catch (InterruptedException e1) {
-                                e1.printStackTrace();
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
                             }
-                            gam.getNextGeneration();
-                            generation = gam.getGeneration();
+                            engine.getNextGeneration();
                         }
                     }
                 }.start();
@@ -78,22 +72,12 @@ class MainPanel extends JPanel {
         clear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GameEngine game = new GameEngine(getCellArray(countX, countY));
-                generation = game.getGeneration();
+                engine.resetEngineStain();
+                gameIsRun = false;
                 repaint();
             }
         });
         this.add(clear);
-    }
-
-    private Cell[][] getCellArray(int countX, int countY) {
-        Cell[][] result = new Cell[countY][countX];
-        for (int indexY = 0; indexY < countY; indexY++) {
-            for (int indexX = 0; indexX < countX; indexX++) {
-                result[indexY][indexX] = new Cell(false);
-            }
-        }
-        return result;
     }
 
     public void paintComponent(Graphics g) {
@@ -115,14 +99,14 @@ class MainPanel extends JPanel {
             vSteps += pixelSize + borderSize;
         }
 
-        for (int indexY = 0; indexY < generation.length; indexY++) {
-            for (int indexX = 0; indexX < generation[0].length; indexX++) {
-                if (generation[indexY][indexX].isAlive()) {
+        for (int y = 0; y < engine.getHorizontalCellCount(); y++) {
+            for (int x = 0; x < engine.getVerticalCellCount(); x++) {
+                if (engine.getCellStain(x,y)) {
                     g.setColor(new Color(102, 255, 96));
-                    g.fillRect(indexX * pixelSize + indexX * borderSize + borderSize, indexY * pixelSize + indexY * borderSize + borderSize, pixelSize, pixelSize);
+                    g.fillRect(x * pixelSize + x * borderSize + borderSize, y * pixelSize + y * borderSize + borderSize, pixelSize, pixelSize);
                 } else {
                     g.setColor(new Color(76, 95, 255));
-                    g.fillRect(indexX * pixelSize + indexX * borderSize + borderSize, indexY * pixelSize + indexY * borderSize + borderSize, pixelSize, pixelSize);
+                    g.fillRect(x * pixelSize + x * borderSize + borderSize, y * pixelSize + y * borderSize + borderSize, pixelSize, pixelSize);
                 }
             }
 

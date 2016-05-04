@@ -4,41 +4,67 @@ package gameoflife.model;
  * Sergej Povzaniuk
  * 2016-04-26.
  */
-public class GameEngine {
+public class GameEngine implements Engine {
 
     private Cell[][] generation;
 
-    public GameEngine(Cell[][] generation) {
-        this.generation = getCellArray(generation);
+    public GameEngine(int width, int height) {
+        this.generation = getStartCellArray(width, height);
     }
 
     public Cell[][] getGeneration() {
         return generation;
     }
 
-    private Cell[][] getCellArray(Cell[][] generation) {
-        int height = generation.length, width = generation[0].length;
-        Cell[][] cells = new Cell[height][width];
+    public int getVerticalCellCount() {
+        return generation[0].length;
+    }
+
+    public int getHorizontalCellCount() {
+        return generation.length;
+    }
+
+    @Override
+    public void setCellStain(int x, int y, boolean isAlive) {
+        generation[y][x].setStain(isAlive);
+        generation = updateNeighbors(generation);
+    }
+
+    @Override
+    public boolean getCellStain(int x, int y) {
+        return generation[y][x].isAlive();
+    }
+
+    private Cell[][] getStartCellArray(int width, int height) {
+        Cell[][] startState = new Cell[height][width];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                cells[y][x] = new Cell(generation[y][x].isAlive(), getNeighborsState(generation, x, y));
+                startState[y][x] = new Cell(false);
             }
         }
-        return cells;
+        return updateNeighbors(startState);
+    }
+
+    private Cell[][] updateNeighbors(Cell[][] startState) {
+        int height = startState.length;
+        int width = startState[0].length;
+        Cell[][] result = new Cell[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                result[y][x] = new Cell(startState[y][x].isAlive(), getNeighborsState(startState, x, y));
+            }
+        }
+        return result;
     }
 
     public void getNextGeneration() {
         Cell[][] nextGeneration = new Cell[generation.length][generation[0].length];
-        int y = 0, x = 0;
         for (Cell[] cells : generation) {
             for (Cell cell : cells) {
                 cell.updateCellStain();
             }
-            y++;
-            x = 0;
         }
-        y = 0;
-        x = 0;
+        int x = 0, y = 0;
         for (Cell[] cells : generation) {
             for (Cell cell : cells) {
                 nextGeneration[y][x] = new Cell(cell.isAlive(), getNeighborsState(generation, x++, y));
@@ -47,6 +73,15 @@ public class GameEngine {
             x = 0;
         }
         generation = nextGeneration;
+    }
+
+    @Override
+    public void resetEngineStain() {
+        for (int y = 0; y < getHorizontalCellCount(); y++) {
+            for (int x = 0; x < getVerticalCellCount(); x++) {
+                generation[y][x] = new Cell(false);
+            }
+        }
     }
 
     private boolean[] getNeighborsState(Cell[][] startGenerationStain, int x, int y) {
@@ -98,4 +133,5 @@ public class GameEngine {
         }
         return result;
     }
+
 }
