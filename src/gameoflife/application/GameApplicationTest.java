@@ -13,8 +13,8 @@ import gameoflife.model.GameEngine;
 public class GameApplicationTest {
     public static void main(String[] args) {
         try {
-            Engine engine = new GameEngine(50, 60);
-            MainFrame frame = new MainFrame(engine, 10);
+            Engine engine = new GameEngine(10, 10);
+            MainFrame frame = new MainFrame(engine, 50);
         } catch (IllegalArgumentException ex) {
             System.out.println(ex.getMessage());
         }

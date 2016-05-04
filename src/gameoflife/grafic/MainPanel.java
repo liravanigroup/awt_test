@@ -4,10 +4,7 @@ import gameoflife.model.Engine;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 /**
  * awt_test
@@ -27,12 +24,23 @@ class MainPanel extends JPanel {
         this.borderSize = borderSize;
         this.engine = engine;
 
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = e.getX() / (pixelSize + borderSize);
+                int y = e.getY() / (pixelSize + borderSize);
+                engine.setCellStain(x, y, !engine.getCellStain(x, y));
+                repaint();
+            }
+        });
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 int x = e.getX() / (pixelSize + borderSize);
                 int y = e.getY() / (pixelSize + borderSize);
-                engine.setCellStain(x,y,!engine.getCellStain(x,y));
+                engine.setCellStain(x, y, !engine.getCellStain(x, y));
                 repaint();
             }
         });
@@ -44,7 +52,7 @@ class MainPanel extends JPanel {
                 gameIsRun = true;
                 new Thread() {
                     public void run() {
-                        while (gameIsRun && engine.getAliveCount()>0) {
+                        while (gameIsRun && engine.getAliveCount() > 0) {
                             repaint();
                             try {
                                 Thread.sleep(100);
@@ -101,7 +109,7 @@ class MainPanel extends JPanel {
 
         for (int y = 0; y < engine.getHorizontalCellCount(); y++) {
             for (int x = 0; x < engine.getVerticalCellCount(); x++) {
-                if (engine.getCellStain(x,y)) {
+                if (engine.getCellStain(x, y)) {
                     g.setColor(new Color(102, 255, 96));
                     g.fillRect(x * pixelSize + x * borderSize + borderSize, y * pixelSize + y * borderSize + borderSize, pixelSize, pixelSize);
                 } else {
