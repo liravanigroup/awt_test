@@ -44,7 +44,7 @@ class MainPanel extends JPanel {
                 gameIsRun = true;
                 new Thread() {
                     public void run() {
-                        while (gameIsRun) {
+                        while (gameIsRun && engine.getAliveCount()>0) {
                             repaint();
                             try {
                                 Thread.sleep(100);
