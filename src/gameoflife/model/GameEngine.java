@@ -8,8 +8,10 @@ public class GameEngine implements Engine {
 
     private Cell[][] generation;
 
-    public GameEngine(int width, int height) {
-        this.generation = getStartCellArray(width, height);
+    public GameEngine(int horizontalCellCount, int verticalCellCount) {
+        if(horizontalCellCount <= 0 || verticalCellCount <= 0)
+            throw new IllegalArgumentException("Cell count should be more 0");
+        this.generation = getStartCellArray(horizontalCellCount, verticalCellCount);
     }
 
     public Cell[][] getGeneration() {

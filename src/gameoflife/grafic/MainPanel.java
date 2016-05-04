@@ -47,7 +47,7 @@ class MainPanel extends JPanel {
                         while (gameIsRun) {
                             repaint();
                             try {
-                                Thread.sleep(500);
+                                Thread.sleep(100);
                             } catch (InterruptedException ex) {
                                 ex.printStackTrace();
                             }
